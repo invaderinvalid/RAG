@@ -64,6 +64,8 @@ flowchart TD
     style RAG fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff,rx:5,ry:5
     style Store fill:#388e3c,stroke:#1b5e20,stroke-width:2px,color:#fff,rx:5,ry:5
     style Session fill:#5d4037,stroke:#3e2723,stroke-width:2px,color:#fff,rx:5,ry:5
+    
+    linkStyle default stroke:#e0e0e0,stroke-width:2px
 ```
 
 ---
@@ -364,6 +366,8 @@ flowchart TD
     style Analysis fill:#6a1b9a,stroke:#4a148c,stroke-width:3px,color:#fff,rx:5,ry:5
     style NewSearch fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
     style Commands fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:5,ry:5
+    
+    linkStyle default stroke:#e0e0e0,stroke-width:2px
 ```
 
 This interactive mode:
@@ -499,6 +503,8 @@ flowchart LR
     style Sim fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
     style TopK fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
     style LLM fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    
+    linkStyle default stroke:#e0e0e0,stroke-width:2px
 ```
 
 The RAG pattern ensures answers are grounded in actual paper content rather than relying solely on the LLM's training data:
@@ -546,6 +552,8 @@ flowchart TD
     style B2 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
     style B3 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
     style B4 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    
+    linkStyle default stroke:#e0e0e0,stroke-width:2px
 ```
 
 Raw retrieved chunks are often redundant. ScaleDown's compression:
@@ -595,6 +603,8 @@ flowchart LR
     style Papers2 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
     style Workflow1 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
     style Workflow2 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    
+    linkStyle default stroke:#e0e0e0,stroke-width:2px
 ```
 
 A single Gemini call classifies questions into three tiers:
@@ -630,6 +640,8 @@ flowchart TD
     style Retry fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
     style Wait fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
     style Fallback fill:#ef6c00,stroke:#e65100,stroke-width:2px,color:#fff,rx:5,ry:5
+    
+    linkStyle default stroke:#e0e0e0,stroke-width:2px
 ```
 
 **Implementation:**
