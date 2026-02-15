@@ -1,0 +1,1537 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A RAG system for exploring scientific papers with ScaleDown compression and Gemini intelligence">
+      
+      
+        <meta name="author" content="RAG Team">
+      
+      
+        <link rel="canonical" href="https://invaderinvalid.github.io/RAG/methodology/">
+      
+      
+        <link rel="prev" href="../examples/">
+      
+      
+        <link rel="next" href="../anti-hallucination/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Methodology - Scientific Literature Explorer</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="slate" data-md-color-primary="blue" data-md-color-accent="orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#methodology" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="Scientific Literature Explorer" class="md-header__button md-logo" aria-label="Scientific Literature Explorer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Scientific Literature Explorer
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Methodology
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+    
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/invaderinvalid/RAG" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../architecture/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Architecture
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../setup/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../usage/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Usage
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Technical Details
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../api-reference/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../limitations/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Additional Info
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Scientific Literature Explorer" class="md-nav__button md-logo" aria-label="Scientific Literature Explorer" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Scientific Literature Explorer
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/invaderinvalid/RAG" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Architecture
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-it-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../configuration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usage
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Usage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Technical Details
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Technical Details
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Methodology
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Methodology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-retrieval-augmented-generation-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Retrieval-Augmented Generation (RAG)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-context-compression-scaledown" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Context Compression (ScaleDown)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-multi-stage-reasoning-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Multi-Stage Reasoning Workflow
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-question-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Question Triage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-resilient-llm-strategy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Resilient LLM Strategy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-anti-hallucination-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next: Anti-Hallucination Details
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../anti-hallucination/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Anti-Hallucination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../project-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Additional Info
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Additional Info
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../limitations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limitations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../improvements/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Improvements
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="methodology">Methodology<a class="headerlink" href="#methodology" title="Permanent link">&para;</a></h1>
+<p>This page explains the technical approaches and design patterns used in the Scientific Literature Explorer.</p>
+<hr />
+<h2 id="1-retrieval-augmented-generation-rag">1. Retrieval-Augmented Generation (RAG)<a class="headerlink" href="#1-retrieval-augmented-generation-rag" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
+flowchart LR
+    Paper([Paper Text]) --&gt; Chunk[Chunking&lt;br/&gt;1000 chars&lt;br/&gt;200 overlap]
+
+    Chunk --&gt; Vec[TF-IDF&lt;br/&gt;Vectorization&lt;br/&gt;sklearn]
+    Vec --&gt; Index[(Chunk Index&lt;br/&gt;Sparse Matrix)]
+
+    Query([User Query]) --&gt; QVec[Vectorize Query&lt;br/&gt;Same TF-IDF]
+    QVec --&gt; Sim[Cosine&lt;br/&gt;Similarity]
+    Index --&gt; Sim
+
+    Sim --&gt; TopK[Top-K Chunks&lt;br/&gt;default: 5]
+    TopK --&gt; Compress[ScaleDown&lt;br/&gt;Compression&lt;br/&gt;40-60% reduction]
+
+    Compress --&gt; LLM[Gemini&lt;br/&gt;Generation]
+    LLM --&gt; Answer([Answer with&lt;br/&gt;Citations])
+
+    style Paper fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Query fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Index fill:#1565c0,stroke:#0d47a1,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Compress fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Answer fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Chunk fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Vec fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style QVec fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Sim fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style TopK fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style LLM fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+
+    linkStyle default stroke:#e0e0e0,stroke-width:2px</code></pre>
+<p>The RAG pattern ensures answers are grounded in actual paper content rather than relying solely on the LLM's training data:</p>
+<ul>
+<li><strong>Chunking</strong>: Papers are split into overlapping segments (1000 chars, 200 overlap) to ensure no information is lost at boundaries</li>
+<li><strong>TF-IDF Vectorization</strong>: scikit-learn's <code>TfidfVectorizer</code> creates sparse vector representations with English stop-word removal</li>
+<li><strong>Cosine Similarity</strong>: Queries are matched against the chunk index; top-k (default 5) most similar chunks are retrieved</li>
+<li><strong>Source Tracking</strong>: Every chunk retains its source label (e.g., <code>arxiv:2511.14362</code>) for citation tracing</li>
+</ul>
+<hr />
+<h2 id="2-context-compression-scaledown">2. Context Compression (ScaleDown)<a class="headerlink" href="#2-context-compression-scaledown" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
+flowchart TD
+    Raw[Raw Retrieved Chunks&lt;br/&gt;1500 tokens&lt;br/&gt;Redundant verbose] --&gt; SD{ScaleDown API}
+
+    Query[User Question] --&gt; SD
+    SD --&gt; Analyze[Query-Aware&lt;br/&gt;Analysis]
+
+    Analyze --&gt; Remove[Remove Redundancy]
+    Remove --&gt; Preserve[Preserve Semantics]
+    Preserve --&gt; Optimize[Optimize for&lt;br/&gt;gemini-2.5-flash&lt;br/&gt;tokenizer]
+
+    Optimize --&gt; Compressed[Compressed Context&lt;br/&gt;600 tokens&lt;br/&gt;40-60% reduction]
+
+    Compressed --&gt; Benefits
+
+    subgraph Benefits [Benefits]
+        B1[Lower API Cost]
+        B2[Faster Response]
+        B3[More Context Fits&lt;br/&gt;in Window]
+        B4[Better Focus]
+    end
+
+    style Raw fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Query fill:#424242,stroke:#212121,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Compressed fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:5,ry:5
+    style SD fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Analyze fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Remove fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Preserve fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Optimize fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Benefits fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style B1 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    style B2 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    style B3 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    style B4 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+
+    linkStyle default stroke:#e0e0e0,stroke-width:2px</code></pre>
+<p>Raw retrieved chunks are often redundant. ScaleDown's compression:
+- Reduces token count by 40-60% while preserving semantics
+- Uses the user's question as a guide (<code>prompt</code> parameter) to prioritize relevant information
+- Optimizes for the target model's tokenizer (<code>gemini-2.5-flash</code>)
+- The <code>"rate": "auto"</code> setting lets ScaleDown determine optimal compression</p>
+<hr />
+<h2 id="3-multi-stage-reasoning-workflow">3. Multi-Stage Reasoning Workflow<a class="headerlink" href="#3-multi-stage-reasoning-workflow" title="Permanent link">&para;</a></h2>
+<p>Inspired by research on self-verification and chain-of-verification (CoVe):</p>
+<ul>
+<li><strong>Chain-of-Thought</strong>: Forces step-by-step reasoning, reducing reasoning errors</li>
+<li><strong>Self-Verification</strong>: A separate LLM call cross-references every claim against source documents</li>
+<li><strong>Self-Critique</strong>: An independent evaluator checks for completeness and accuracy</li>
+<li>Stages are <strong>configurable</strong> — enable, disable, or reorder via CLI</li>
+</ul>
+<hr />
+<h2 id="4-question-triage">4. Question Triage<a class="headerlink" href="#4-question-triage" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
+flowchart LR
+    Q([Question]) --&gt; Classify{Gemini Triage&lt;br/&gt;+ Keyword Extract}
+
+    Classify --&gt;|GENERAL&lt;br/&gt;What is CNN?| Direct[Direct Answer&lt;br/&gt;No Papers&lt;br/&gt;~5s]
+    Classify --&gt;|CONCEPTUAL&lt;br/&gt;Explain attention| Minimal[Basic Search&lt;br/&gt;Skip Critique&lt;br/&gt;~15s]
+    Classify --&gt;|RESEARCH&lt;br/&gt;Latest NAS methods?| Full[Full Discovery&lt;br/&gt;COT+Verify+Critique&lt;br/&gt;~45s]
+
+    Direct --&gt; Answer1([Answer])
+    Minimal --&gt; Papers1[Light Paper Fetch]
+    Papers1 --&gt; Workflow1[Workflow&lt;br/&gt;critique=OFF]
+    Workflow1 --&gt; Answer2([Answer])
+
+    Full --&gt; Papers2[Deep Paper Discovery]
+    Papers2 --&gt; Workflow2[Full Workflow&lt;br/&gt;All Stages ON]
+    Workflow2 --&gt; Answer3([Answer])
+
+    style Q fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Classify fill:#d32f2f,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Direct fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Minimal fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Full fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Answer1 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:10,ry:10
+    style Answer2 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:10,ry:10
+    style Answer3 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:10,ry:10
+    style Papers1 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Papers2 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Workflow1 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Workflow2 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+
+    linkStyle default stroke:#e0e0e0,stroke-width:2px</code></pre>
+<p>A single Gemini call classifies questions into three tiers:
+- <strong>General</strong>: Simple factual questions → answered directly (no paper fetch, ~5s)
+- <strong>Conceptual</strong>: Needs depth but not specific papers → uses workflow but may skip critique
+- <strong>Research</strong>: Needs actual papers → full discovery + workflow pipeline</p>
+<p>This saves 60-90 seconds for simple questions by skipping paper discovery entirely.</p>
+<hr />
+<h2 id="5-resilient-llm-strategy">5. Resilient LLM Strategy<a class="headerlink" href="#5-resilient-llm-strategy" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
+flowchart TD
+    Start([API Call]) --&gt; Gemini{Gemini API}
+
+    Gemini --&gt;|Success 200| Success([Return Response])
+    Gemini --&gt;|Rate Limit 429| Retry{Retry Count&lt;br/&gt;&lt; 5?}
+
+    Retry --&gt;|Yes| Wait[Exponential Backoff&lt;br/&gt;5s, 10s, 20s, 40s, 60s]
+    Wait --&gt; Gemini
+
+    Retry --&gt;|No, All Failed| Fallback[ScaleDown&lt;br/&gt;Compression-as-Generation]
+    Fallback --&gt; FallbackSuccess([Return Compressed&lt;br/&gt;Extraction])
+
+    Gemini --&gt;|Other Error| Fail([Raise Exception])
+
+    style Start fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Gemini fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Success fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:10,ry:10
+    style FallbackSuccess fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Fail fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Retry fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Wait fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Fallback fill:#ef6c00,stroke:#e65100,stroke-width:2px,color:#fff,rx:5,ry:5
+
+    linkStyle default stroke:#e0e0e0,stroke-width:2px</code></pre>
+<p><strong>Implementation:</strong>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">Primary</span><span class="p">:</span> <span class="n">Gemini</span> <span class="mf">2.5</span> <span class="n">Flash</span> <span class="p">(</span><span class="n">full</span> <span class="n">generation</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="err">│</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="err">├──</span> <span class="n">Rate</span> <span class="n">limited</span> <span class="p">(</span><span class="mi">429</span><span class="p">)</span><span class="err">?</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="err">│</span>   <span class="err">└──</span> <span class="n">Retry</span> <span class="k">with</span> <span class="n">exponential</span> <span class="n">backoff</span> <span class="p">(</span><span class="mi">5</span><span class="err">×</span> <span class="n">up</span> <span class="n">to</span> <span class="mi">60</span><span class="n">s</span><span class="p">)</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="err">│</span>       <span class="err">└──</span> <span class="n">Still</span> <span class="n">limited</span><span class="err">?</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="err">│</span>           <span class="err">└──</span> <span class="n">Fallback</span><span class="p">:</span> <span class="n">ScaleDown</span> <span class="n">compression</span><span class="o">-</span><span class="k">as</span><span class="o">-</span><span class="n">generation</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="err">│</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="err">└──</span> <span class="n">Research</span> <span class="n">Agent</span> <span class="n">rate</span><span class="o">-</span><span class="n">limited</span><span class="err">?</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="err">└──</span> <span class="n">Heuristic</span> <span class="n">keyword</span> <span class="n">extraction</span> <span class="p">(</span><span class="n">regex</span><span class="o">-</span><span class="n">based</span><span class="p">,</span> <span class="n">no</span> <span class="n">API</span> <span class="n">call</span><span class="p">)</span>
+</span></code></pre></div></p>
+<hr />
+<h2 id="next-anti-hallucination-details">Next: Anti-Hallucination Details<a class="headerlink" href="#next-anti-hallucination-details" title="Permanent link">&para;</a></h2>
+<p>See <strong><a href="../anti-hallucination/">Anti-Hallucination Pipeline</a></strong> for the full verification workflow.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 Scientific Literature Explorer
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/yourusername/RAG" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.tracking", "navigation.indexes", "toc.integrate", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
