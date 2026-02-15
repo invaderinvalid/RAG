@@ -52,11 +52,17 @@ flowchart TD
     
     Session --> Output([Answer + Citations])
     
-    style Start fill:#e1f5ff
-    style Output fill:#c8e6c9
-    style Compress fill:#fff59d
-    style Workflow fill:#f3e5f5
-    style Triage fill:#ffe0b2
+    style Start fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff
+    style Output fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
+    style Compress fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
+    style Workflow fill:#7b1fa2,stroke:#4a148c,stroke-width:2px,color:#fff
+    style Triage fill:#d32f2f,stroke:#b71c1c,stroke-width:3px,color:#fff
+    style DirectAnswer fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff
+    style ArXiv fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff
+    style PDFs fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff
+    style RAG fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff
+    style Store fill:#388e3c,stroke:#1b5e20,stroke-width:2px,color:#fff
+    style Session fill:#5d4037,stroke:#3e2723,stroke-width:2px,color:#fff
 ```
 
 ---
@@ -104,6 +110,7 @@ flowchart TD
 ### ScaleDown API Endpoint
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#f57c00','primaryTextColor':'#fff','primaryBorderColor':'#e65100','lineColor':'#424242'}}}%%
 sequenceDiagram
     participant Client
     participant SD as ScaleDown API
@@ -111,14 +118,14 @@ sequenceDiagram
     Client->>SD: POST /compress/raw/
     Note over Client,SD: Headers: x-api-key<br/>Content-Type: application/json
     
-    Note left of Client: Payload:<br/>{<br/>  "context": "1500 tokens...",<br/>  "prompt": "user question",<br/>  "model": "gemini-2.5-flash",<br/>  "scaledown": {"rate": "auto"}<br/>}
+    Note left of Client: Payload<br/>context: 1500 tokens<br/>prompt: user question<br/>model: gemini-2.5-flash<br/>scaledown rate: auto
     
-    SD->>SD: Analyze context<br/>+ prompt relevance
-    SD->>SD: Apply query-aware<br/>compression
-    SD->>SD: Optimize for target<br/>model tokenizer
+    SD->>SD: Analyze context + prompt relevance
+    SD->>SD: Apply query-aware compression
+    SD->>SD: Optimize for target model tokenizer
     
     SD-->>Client: Response (2.3s)
-    Note right of SD: {<br/>  "compressed_prompt": "600 tokens",<br/>  "original_tokens": 1500,<br/>  "compressed_tokens": 600,<br/>  "successful": true,<br/>  "latency_ms": 2341<br/>}
+    Note right of SD: compressed_prompt: 600 tokens<br/>original_tokens: 1500<br/>compressed_tokens: 600<br/>successful: true<br/>latency_ms: 2341
     
     Note over Client,SD: 60% reduction in token count
 ```
@@ -186,38 +193,39 @@ This prevents the model from spending excessive time on internal reasoning, redu
 The system uses a multi-stage approach to minimize hallucination:
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#1976d2','primaryTextColor':'#fff','primaryBorderColor':'#0d47a1','lineColor':'#424242','secondaryColor':'#f57c00','tertiaryColor':'#2e7d32'}}}%%
 sequenceDiagram
     participant User
     participant RAG as RAG Pipeline
     participant SD as ScaleDown
-    participant G1 as Gemini<br/>(COT)
-    participant G2 as Gemini<br/>(Verify)
-    participant G3 as Gemini<br/>(Critique)
+    participant G1 as Gemini COT
+    participant G2 as Gemini Verify
+    participant G3 as Gemini Critique
     participant Store as Artifact Store
 
     User->>RAG: Research Question
-    RAG->>RAG: Retrieve top-k chunks<br/>(TF-IDF)
-    RAG->>SD: Compress context<br/>~1500 tokens
-    SD-->>RAG: Compressed<br/>~600 tokens (40%)
+    RAG->>RAG: Retrieve top-k chunks (TF-IDF)
+    RAG->>SD: Compress context ~1500 tokens
+    SD-->>RAG: Compressed ~600 tokens (40%)
     
     RAG->>G1: System: Strict citation rules<br/>User: Question + Context
     Note over G1: thinking_budget: 2048<br/>max_tokens: 8192
-    G1->>G1: Generate COT<br/>with inline citations
-    G1-->>Store: COT Answer<br/>[arxiv:XXXX] tags
+    G1->>G1: Generate COT with inline citations
+    G1-->>Store: COT Answer [arxiv:XXXX] tags
     
-    Store->>G2: Verify citations<br/>Draft + Sources
+    Store->>G2: Verify citations Draft + Sources
     Note over G2: thinking_budget: 1024<br/>max_tokens: 4096<br/>(Faster/Cheaper)
-    G2->>G2: Check each citation<br/>against source text
-    G2-->>Store: Verification Table<br/>SUPPORTED/NOT FOUND
+    G2->>G2: Check each citation against source text
+    G2-->>Store: Verification Table SUPPORTED/NOT FOUND
     
-    Store->>G3: Critique answer<br/>for completeness
+    Store->>G3: Critique answer for completeness
     Note over G3: thinking_budget: 1024<br/>max_tokens: 4096
-    G3->>G3: Evaluate quality<br/>suggest improvements
+    G3->>G3: Evaluate quality suggest improvements
     G3-->>Store: Critique Report
     
     Store->>SD: Compress artifacts
     SD-->>Store: Compressed markdown
-    Store-->>User: Final Answer<br/>+ Citation Summary
+    Store-->>User: Final Answer + Citation Summary
 ```
 
 ### Stage 1: Strict Citation Rules (COT)
@@ -326,6 +334,7 @@ python -m src.main papers "attention mechanism transformers"
 ```
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#1976d2','primaryTextColor':'#fff','primaryBorderColor':'#0d47a1'}}}%%
 stateDiagram-v2
     [*] --> PaperList: Search ArXiv
     
@@ -346,21 +355,21 @@ stateDiagram-v2
     
     note right of Analysis
         Full Pipeline:
-        - Fetch & index paper
-        - RAG retrieval
-        - ScaleDown compress
-        - COT → Verify
-        - Session persisted
+        Fetch & index paper
+        RAG retrieval
+        ScaleDown compress
+        COT → Verify
+        Session persisted
     end note
     
     note right of PaperSelected
         Commands:
-        - <text>: Ask question
-        - <number>: Switch paper
-        - 'back': To list
-        - 'list': Show papers
-        - 's': New search
-        - 'q': Quit
+        text: Ask question
+        number: Switch paper
+        back: To list
+        list: Show papers
+        s: New search
+        q: Quit
     end note
 ```
 
@@ -485,9 +494,17 @@ flowchart LR
     Compress --> LLM[Gemini<br/>Generation]
     LLM --> Answer([Answer with<br/>Citations])
     
-    style Index fill:#e1f5ff
-    style Compress fill:#fff59d
-    style Answer fill:#c8e6c9
+    style Paper fill:#424242,stroke:#212121,stroke-width:3px,color:#fff
+    style Query fill:#424242,stroke:#212121,stroke-width:3px,color:#fff
+    style Index fill:#1565c0,stroke:#0d47a1,stroke-width:3px,color:#fff
+    style Compress fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
+    style Answer fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
+    style Chunk fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Vec fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style QVec fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Sim fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
+    style TopK fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
+    style LLM fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
 ```
 
 The RAG pattern ensures answers are grounded in actual paper content rather than relying solely on the LLM's training data:
@@ -501,7 +518,7 @@ The RAG pattern ensures answers are grounded in actual paper content rather than
 
 ```mermaid
 flowchart TD
-    Raw[Raw Retrieved Chunks<br/>1500 tokens<br/>Redundant, verbose] --> SD{ScaleDown API}
+    Raw[Raw Retrieved Chunks<br/>1500 tokens<br/>Redundant verbose] --> SD{ScaleDown API}
     
     Query[User Question] --> SD
     SD --> Analyze[Query-Aware<br/>Analysis]
@@ -521,9 +538,19 @@ flowchart TD
         B4[Better Focus]
     end
     
-    style Raw fill:#ffcdd2
-    style Compressed fill:#c8e6c9
-    style SD fill:#fff59d
+    style Raw fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff
+    style Query fill:#424242,stroke:#212121,stroke-width:2px,color:#fff
+    style Compressed fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
+    style SD fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
+    style Analyze fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Remove fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Preserve fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Optimize fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Benefits fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
+    style B1 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
+    style B2 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
+    style B3 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
+    style B4 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
 ```
 
 Raw retrieved chunks are often redundant. ScaleDown's compression:
@@ -547,9 +574,9 @@ Inspired by research on self-verification and chain-of-verification (CoVe):
 flowchart LR
     Q([Question]) --> Classify{Gemini Triage<br/>+ Keyword Extract}
     
-    Classify -->|GENERAL<br/>"What is CNN?"| Direct[Direct Answer<br/>No Papers<br/>~5s]
-    Classify -->|CONCEPTUAL<br/>"Explain attention"| Minimal[Basic Search<br/>Skip Critique<br/>~15s]
-    Classify -->|RESEARCH<br/>"Latest NAS methods?"| Full[Full Discovery<br/>COT+Verify+Critique<br/>~45s]
+    Classify -->|GENERAL<br/>What is CNN?| Direct[Direct Answer<br/>No Papers<br/>~5s]
+    Classify -->|CONCEPTUAL<br/>Explain attention| Minimal[Basic Search<br/>Skip Critique<br/>~15s]
+    Classify -->|RESEARCH<br/>Latest NAS methods?| Full[Full Discovery<br/>COT+Verify+Critique<br/>~45s]
     
     Direct --> Answer1([Answer])
     Minimal --> Papers1[Light Paper Fetch]
@@ -560,9 +587,18 @@ flowchart LR
     Papers2 --> Workflow2[Full Workflow<br/>All Stages ON]
     Workflow2 --> Answer3([Answer])
     
-    style Direct fill:#c8e6c9
-    style Minimal fill:#fff59d
-    style Full fill:#ffccbc
+    style Q fill:#424242,stroke:#212121,stroke-width:3px,color:#fff
+    style Classify fill:#d32f2f,stroke:#b71c1c,stroke-width:3px,color:#fff
+    style Direct fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
+    style Minimal fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
+    style Full fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff
+    style Answer1 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff
+    style Answer2 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff
+    style Answer3 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff
+    style Papers1 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Papers2 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Workflow1 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
+    style Workflow2 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
 ```
 
 A single Gemini call classifies questions into three tiers:
@@ -589,9 +625,14 @@ flowchart TD
     
     Gemini -->|Other Error| Fail([Raise Exception])
     
-    style Success fill:#c8e6c9
-    style FallbackSuccess fill:#fff59d
-    style Fail fill:#ffcdd2
+    style Start fill:#424242,stroke:#212121,stroke-width:3px,color:#fff
+    style Gemini fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff
+    style Success fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
+    style FallbackSuccess fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
+    style Fail fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff
+    style Retry fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
+    style Wait fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
+    style Fallback fill:#ef6c00,stroke:#e65100,stroke-width:2px,color:#fff
 ```
 
 **Implementation:**
