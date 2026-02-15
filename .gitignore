@@ -6,4 +6,5 @@ artifacts/
 venv/
 .venv/
 *.txt
-Project.md
+Project.mdsite/
+site/

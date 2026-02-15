@@ -1,0 +1,108 @@
+site_name: Scientific Literature Explorer
+site_description: A RAG system for exploring scientific papers with ScaleDown compression and Gemini intelligence
+site_author: RAG Team
+
+repo_url: https://github.com/yourusername/RAG
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: blue
+    accent: orange
+  
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  # Code highlighting
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  
+  # Tabs
+  - pymdownx.tabbed:
+      alternate_style: true
+  
+  # Notes and admonitions
+  - admonition
+  - pymdownx.details
+  
+  # Better lists
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  
+  # Formatting
+  - pymdownx.betterem
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  
+  # TOC
+  - toc:
+      permalink: true
+      toc_depth: 3
+  
+  # Metadata
+  - meta
+  - attr_list
+  - md_in_html
+
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-\.]+'
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/yourusername/RAG
+  
+  generator: false
+
+nav:
+  - Home: index.md
+  - Architecture:
+      - Overview: architecture.md
+      - How It Works: how-it-works.md
+  - Getting Started:
+      - Installation: setup.md
+      - Configuration: configuration.md
+  - Usage:
+      - Commands: usage.md
+      - Examples: examples.md
+  - Technical Details:
+      - Methodology: methodology.md
+      - Anti-Hallucination: anti-hallucination.md
+  - Reference:
+      - API Reference: api-reference.md
+      - Project Structure: project-structure.md
+  - Additional Info:
+      - Limitations: limitations.md
+      - Improvements: improvements.md
+
+copyright: Copyright &copy; 2026 Scientific Literature Explorer
