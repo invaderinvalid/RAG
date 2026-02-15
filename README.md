@@ -23,49 +23,40 @@ A **Retrieval-Augmented Generation (RAG)** system for exploring scientific paper
 
 ## Architecture Overview
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        Scientific Literature Explorer                       │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│   User Question                                                             │
-│        │                                                                    │
-│        ▼                                                                    │
-│   ┌─────────────┐    ┌──────────────┐    ┌─────────────────┐               │
-│   │  Research    │───▶│  ArXiv API   │───▶│  PDF Download   │               │
-│   │  Agent       │    │  Search      │    │  & Extraction   │               │
-│   │  (Triage +   │    └──────────────┘    └────────┬────────┘               │
-│   │   Keywords)  │                                 │                        │
-│   └─────────────┘                                  ▼                        │
-│                                           ┌─────────────────┐              │
-│                                           │  RAG Pipeline    │              │
-│                                           │  (Chunk → TF-IDF │              │
-│                                           │   → Retrieve)    │              │
-│                                           └────────┬────────┘              │
-│                                                    │                        │
-│                                                    ▼                        │
-│                                           ┌─────────────────┐              │
-│                                           │  ScaleDown API   │              │
-│                                           │  (Compress       │              │
-│                                           │   Context)       │              │
-│                                           └────────┬────────┘              │
-│                                                    │                        │
-│                                                    ▼                        │
-│   ┌─────────────────────────────────────────────────────────────────┐       │
-│   │              Anti-Hallucination Workflow                        │       │
-│   │  ┌───────────┐    ┌──────────────┐    ┌────────────────┐       │       │
-│   │  │   COT     │───▶│ Self-Verify  │───▶│ Self-Critique  │       │       │
-│   │  │ (Gemini)  │    │ (Gemini Fast)│    │ (Gemini Fast)  │       │       │
-│   │  └───────────┘    └──────────────┘    └────────────────┘       │       │
-│   └─────────────────────────────────────────────────────────────────┘       │
-│                                                    │                        │
-│                                                    ▼                        │
-│                                           ┌─────────────────┐              │
-│                                           │  Markdown        │              │
-│                                           │  Artifacts +     │              │
-│                                           │  Session Store   │              │
-│                                           └─────────────────┘              │
-└─────────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TD
+    Start([User Question]) --> Triage[Research Agent<br/>Triage + Keywords<br/>Gemini]
+    
+    Triage -->|General Question| DirectAnswer[Direct Answer<br/>Gemini COT]
+    Triage -->|Research Question| ArXiv[ArXiv API Search]
+    
+    ArXiv --> PDFs[Parallel PDF Download<br/>& Text Extraction<br/>PyPDF2]
+    PDFs --> RAG[RAG Pipeline<br/>Chunk → TF-IDF → Retrieve]
+    
+    RAG --> Compress[ScaleDown API<br/>Context Compression<br/>40-60% reduction]
+    
+    Compress --> Workflow[Anti-Hallucination Workflow]
+    DirectAnswer --> Workflow
+    
+    subgraph Workflow [Reasoning Pipeline]
+        COT[Chain-of-Thought<br/>Gemini 2048 tokens<br/>Strict Citations]
+        Verify[Self-Verification<br/>Gemini Fast 1024 tokens<br/>Citation Check]
+        Critique[Self-Critique<br/>Gemini Fast 1024 tokens<br/>Quality Review]
+        
+        COT --> Verify
+        Verify --> Critique
+    end
+    
+    Workflow --> Store[Artifact Storage<br/>Compressed Markdown]
+    Store --> Session[(Session JSON<br/>Conversation History)]
+    
+    Session --> Output([Answer + Citations])
+    
+    style Start fill:#e1f5ff
+    style Output fill:#c8e6c9
+    style Compress fill:#fff59d
+    style Workflow fill:#f3e5f5
+    style Triage fill:#ffe0b2
 ```
 
 ---
@@ -112,29 +103,38 @@ A **Retrieval-Augmented Generation (RAG)** system for exploring scientific paper
 
 ### ScaleDown API Endpoint
 
+```mermaid
+sequenceDiagram
+    participant Client
+    participant SD as ScaleDown API
+    
+    Client->>SD: POST /compress/raw/
+    Note over Client,SD: Headers: x-api-key<br/>Content-Type: application/json
+    
+    Note left of Client: Payload:<br/>{<br/>  "context": "1500 tokens...",<br/>  "prompt": "user question",<br/>  "model": "gemini-2.5-flash",<br/>  "scaledown": {"rate": "auto"}<br/>}
+    
+    SD->>SD: Analyze context<br/>+ prompt relevance
+    SD->>SD: Apply query-aware<br/>compression
+    SD->>SD: Optimize for target<br/>model tokenizer
+    
+    SD-->>Client: Response (2.3s)
+    Note right of SD: {<br/>  "compressed_prompt": "600 tokens",<br/>  "original_tokens": 1500,<br/>  "compressed_tokens": 600,<br/>  "successful": true,<br/>  "latency_ms": 2341<br/>}
+    
+    Note over Client,SD: 60% reduction in token count
 ```
-POST https://api.scaledown.xyz/compress/raw/
 
-Headers:
-  x-api-key: YOUR_SCALEDOWN_API_KEY
-  Content-Type: application/json
+**Raw API Example:**
 
-Payload:
-{
-  "context": "The text to compress...",
-  "prompt": "The user's question (guides compression)",
-  "model": "gemini-2.5-flash",  // target model for tokenizer optimization
-  "scaledown": { "rate": "auto" }
-}
-
-Response:
-{
-  "compressed_prompt": "Compressed text...",
-  "original_prompt_tokens": 1500,
-  "compressed_prompt_tokens": 600,
-  "successful": true,
-  "latency_ms": 2341
-}
+```bash
+curl -X POST https://api.scaledown.xyz/compress/raw/ \\
+  -H "x-api-key: YOUR_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "context": "The text to compress...",
+    "prompt": "The user question (guides compression)",
+    "model": "gemini-2.5-flash",
+    "scaledown": { "rate": "auto" }
+  }'
 ```
 
 ### ScaleDown as Fallback
@@ -184,6 +184,41 @@ This prevents the model from spending excessive time on internal reasoning, redu
 ## Anti-Hallucination Pipeline
 
 The system uses a multi-stage approach to minimize hallucination:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant RAG as RAG Pipeline
+    participant SD as ScaleDown
+    participant G1 as Gemini<br/>(COT)
+    participant G2 as Gemini<br/>(Verify)
+    participant G3 as Gemini<br/>(Critique)
+    participant Store as Artifact Store
+
+    User->>RAG: Research Question
+    RAG->>RAG: Retrieve top-k chunks<br/>(TF-IDF)
+    RAG->>SD: Compress context<br/>~1500 tokens
+    SD-->>RAG: Compressed<br/>~600 tokens (40%)
+    
+    RAG->>G1: System: Strict citation rules<br/>User: Question + Context
+    Note over G1: thinking_budget: 2048<br/>max_tokens: 8192
+    G1->>G1: Generate COT<br/>with inline citations
+    G1-->>Store: COT Answer<br/>[arxiv:XXXX] tags
+    
+    Store->>G2: Verify citations<br/>Draft + Sources
+    Note over G2: thinking_budget: 1024<br/>max_tokens: 4096<br/>(Faster/Cheaper)
+    G2->>G2: Check each citation<br/>against source text
+    G2-->>Store: Verification Table<br/>SUPPORTED/NOT FOUND
+    
+    Store->>G3: Critique answer<br/>for completeness
+    Note over G3: thinking_budget: 1024<br/>max_tokens: 4096
+    G3->>G3: Evaluate quality<br/>suggest improvements
+    G3-->>Store: Critique Report
+    
+    Store->>SD: Compress artifacts
+    SD-->>Store: Compressed markdown
+    Store-->>User: Final Answer<br/>+ Citation Summary
+```
 
 ### Stage 1: Strict Citation Rules (COT)
 
@@ -290,11 +325,50 @@ python -m src.main ask "How does this compare to random search?" --session abc12
 python -m src.main papers "attention mechanism transformers"
 ```
 
-This shows a numbered list of papers. You can:
-- Select a paper by number
-- Ask a question about it (or press Enter for a full summary)
-- The answer runs through the full anti-hallucination pipeline
-- Select another paper or quit
+```mermaid
+stateDiagram-v2
+    [*] --> PaperList: Search ArXiv
+    
+    PaperList --> PaperSelected: Select #
+    PaperList --> NewSearch: Type 's'
+    PaperList --> [*]: Type 'q'
+    
+    PaperSelected --> Analysis: Ask Question
+    Analysis --> PaperSelected: Follow-up
+    
+    PaperSelected --> PaperList: Type 'back'
+    PaperSelected --> NewPaper: Select different #
+    NewPaper --> Analysis
+    
+    Analysis --> [*]: Type 'q'
+    
+    NewSearch --> PaperList: New query
+    
+    note right of Analysis
+        Full Pipeline:
+        - Fetch & index paper
+        - RAG retrieval
+        - ScaleDown compress
+        - COT → Verify
+        - Session persisted
+    end note
+    
+    note right of PaperSelected
+        Commands:
+        - <text>: Ask question
+        - <number>: Switch paper
+        - 'back': To list
+        - 'list': Show papers
+        - 's': New search
+        - 'q': Quit
+    end note
+```
+
+This interactive mode:
+- Maintains a **persistent session** across all interactions
+- **Reuses downloaded papers** — no refetching on follow-ups
+- **Preserves conversation history** — LLM sees previous Q&A
+- Runs the **full anti-hallucination pipeline** for every answer
 
 ### Deep-Dive into a Specific Paper
 
@@ -394,6 +468,28 @@ RAG/
 
 ### 1. Retrieval-Augmented Generation (RAG)
 
+```mermaid
+flowchart LR
+    Paper([Paper Text]) --> Chunk[Chunking<br/>1000 chars<br/>200 overlap]
+    
+    Chunk --> Vec[TF-IDF<br/>Vectorization<br/>sklearn]
+    Vec --> Index[(Chunk Index<br/>Sparse Matrix)]
+    
+    Query([User Query]) --> QVec[Vectorize Query<br/>Same TF-IDF]
+    QVec --> Sim[Cosine<br/>Similarity]
+    Index --> Sim
+    
+    Sim --> TopK[Top-K Chunks<br/>default: 5]
+    TopK --> Compress[ScaleDown<br/>Compression<br/>40-60% reduction]
+    
+    Compress --> LLM[Gemini<br/>Generation]
+    LLM --> Answer([Answer with<br/>Citations])
+    
+    style Index fill:#e1f5ff
+    style Compress fill:#fff59d
+    style Answer fill:#c8e6c9
+```
+
 The RAG pattern ensures answers are grounded in actual paper content rather than relying solely on the LLM's training data:
 
 - **Chunking**: Papers are split into overlapping segments (1000 chars, 200 overlap) to ensure no information is lost at boundaries
@@ -402,6 +498,33 @@ The RAG pattern ensures answers are grounded in actual paper content rather than
 - **Source Tracking**: Every chunk retains its source label (e.g., `arxiv:2511.14362`) for citation tracing
 
 ### 2. Context Compression (ScaleDown)
+
+```mermaid
+flowchart TD
+    Raw[Raw Retrieved Chunks<br/>1500 tokens<br/>Redundant, verbose] --> SD{ScaleDown API}
+    
+    Query[User Question] --> SD
+    SD --> Analyze[Query-Aware<br/>Analysis]
+    
+    Analyze --> Remove[Remove Redundancy]
+    Remove --> Preserve[Preserve Semantics]
+    Preserve --> Optimize[Optimize for<br/>gemini-2.5-flash<br/>tokenizer]
+    
+    Optimize --> Compressed[Compressed Context<br/>600 tokens<br/>40-60% reduction]
+    
+    Compressed --> Benefits
+    
+    subgraph Benefits [Benefits]
+        B1[Lower API Cost]
+        B2[Faster Response]
+        B3[More Context Fits<br/>in Window]
+        B4[Better Focus]
+    end
+    
+    style Raw fill:#ffcdd2
+    style Compressed fill:#c8e6c9
+    style SD fill:#fff59d
+```
 
 Raw retrieved chunks are often redundant. ScaleDown's compression:
 - Reduces token count by 40-60% while preserving semantics
@@ -420,6 +543,28 @@ Inspired by research on self-verification and chain-of-verification (CoVe):
 
 ### 4. Question Triage
 
+```mermaid
+flowchart LR
+    Q([Question]) --> Classify{Gemini Triage<br/>+ Keyword Extract}
+    
+    Classify -->|GENERAL<br/>"What is CNN?"| Direct[Direct Answer<br/>No Papers<br/>~5s]
+    Classify -->|CONCEPTUAL<br/>"Explain attention"| Minimal[Basic Search<br/>Skip Critique<br/>~15s]
+    Classify -->|RESEARCH<br/>"Latest NAS methods?"| Full[Full Discovery<br/>COT+Verify+Critique<br/>~45s]
+    
+    Direct --> Answer1([Answer])
+    Minimal --> Papers1[Light Paper Fetch]
+    Papers1 --> Workflow1[Workflow<br/>critique=OFF]
+    Workflow1 --> Answer2([Answer])
+    
+    Full --> Papers2[Deep Paper Discovery]
+    Papers2 --> Workflow2[Full Workflow<br/>All Stages ON]
+    Workflow2 --> Answer3([Answer])
+    
+    style Direct fill:#c8e6c9
+    style Minimal fill:#fff59d
+    style Full fill:#ffccbc
+```
+
 A single Gemini call classifies questions into three tiers:
 - **General**: Simple factual questions → answered directly (no paper fetch, ~5s)
 - **Conceptual**: Needs depth but not specific papers → uses workflow but may skip critique
@@ -429,7 +574,28 @@ This saves 60-90 seconds for simple questions by skipping paper discovery entire
 
 ### 5. Resilient LLM Strategy
 
+```mermaid
+flowchart TD
+    Start([API Call]) --> Gemini{Gemini API}
+    
+    Gemini -->|Success 200| Success([Return Response])
+    Gemini -->|Rate Limit 429| Retry{Retry Count<br/>< 5?}
+    
+    Retry -->|Yes| Wait[Exponential Backoff<br/>5s, 10s, 20s, 40s, 60s]
+    Wait --> Gemini
+    
+    Retry -->|No, All Failed| Fallback[ScaleDown<br/>Compression-as-Generation]
+    Fallback --> FallbackSuccess([Return Compressed<br/>Extraction])
+    
+    Gemini -->|Other Error| Fail([Raise Exception])
+    
+    style Success fill:#c8e6c9
+    style FallbackSuccess fill:#fff59d
+    style Fail fill:#ffcdd2
 ```
+
+**Implementation:**
+```python
 Primary: Gemini 2.5 Flash (full generation)
     │
     ├── Rate limited (429)?
