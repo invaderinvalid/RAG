@@ -24,6 +24,7 @@ A **Retrieval-Augmented Generation (RAG)** system for exploring scientific paper
 ## Architecture Overview
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
 flowchart TD
     Start([User Question]) --> Triage[Research Agent<br/>Triage + Keywords<br/>Gemini]
     
@@ -52,17 +53,17 @@ flowchart TD
     
     Session --> Output([Answer + Citations])
     
-    style Start fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff
-    style Output fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
-    style Compress fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
-    style Workflow fill:#7b1fa2,stroke:#4a148c,stroke-width:2px,color:#fff
-    style Triage fill:#d32f2f,stroke:#b71c1c,stroke-width:3px,color:#fff
-    style DirectAnswer fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff
-    style ArXiv fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff
-    style PDFs fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff
-    style RAG fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff
-    style Store fill:#388e3c,stroke:#1b5e20,stroke-width:2px,color:#fff
-    style Session fill:#5d4037,stroke:#3e2723,stroke-width:2px,color:#fff
+    style Start fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Output fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Compress fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Workflow fill:#7b1fa2,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Triage fill:#d32f2f,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:5,ry:5
+    style DirectAnswer fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff,rx:5,ry:5
+    style ArXiv fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff,rx:5,ry:5
+    style PDFs fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff,rx:5,ry:5
+    style RAG fill:#0288d1,stroke:#01579b,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Store fill:#388e3c,stroke:#1b5e20,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Session fill:#5d4037,stroke:#3e2723,stroke-width:2px,color:#fff,rx:5,ry:5
 ```
 
 ---
@@ -334,43 +335,35 @@ python -m src.main papers "attention mechanism transformers"
 ```
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#1976d2','primaryTextColor':'#fff','primaryBorderColor':'#0d47a1'}}}%%
-stateDiagram-v2
-    [*] --> PaperList: Search ArXiv
+%%{init: {'theme':'','themeVariables':{'fontFamily':'sans-serif'}}}%%
+flowchart TD
+    Start([Start Explorer]) --> Search[Search ArXiv]
+    Search --> PaperList[Paper List Display]
     
-    PaperList --> PaperSelected: Select #
-    PaperList --> NewSearch: Type 's'
-    PaperList --> [*]: Type 'q'
+    PaperList -->|Select #| PaperSelected[Paper Selected]
+    PaperList -->|Type 's'| NewSearch[New Search]
+    PaperList -->|Type 'q'| End([Exit])
     
-    PaperSelected --> Analysis: Ask Question
-    Analysis --> PaperSelected: Follow-up
+    PaperSelected -->|Ask Question| Analysis[Run Full Pipeline<br/>Fetch + Index + RAG<br/>ScaleDown Compress<br/>COT → Verify<br/>Session Saved]
     
-    PaperSelected --> PaperList: Type 'back'
-    PaperSelected --> NewPaper: Select different #
-    NewPaper --> Analysis
+    Analysis -->|Follow-up| PaperSelected
+    Analysis -->|Type 'q'| End
     
-    Analysis --> [*]: Type 'q'
+    PaperSelected -->|Type 'back'| PaperList
+    PaperSelected -->|Select different #| Analysis
     
-    NewSearch --> PaperList: New query
+    NewSearch -->|New query| Search
     
-    note right of Analysis
-        Full Pipeline:
-        Fetch & index paper
-        RAG retrieval
-        ScaleDown compress
-        COT → Verify
-        Session persisted
-    end note
+    Commands["<b>Interactive Commands</b><br/>━━━━━━━━━━━━━━━━<br/><b>text</b>: Ask question<br/><b>number</b>: Switch paper<br/><b>back</b>: To list<br/><b>list</b>: Show papers<br/><b>s</b>: New search<br/><b>q</b>: Quit"]
     
-    note right of PaperSelected
-        Commands:
-        text: Ask question
-        number: Switch paper
-        back: To list
-        list: Show papers
-        s: New search
-        q: Quit
-    end note
+    style Start fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style End fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Search fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff,rx:5,ry:5
+    style PaperList fill:#00838f,stroke:#006064,stroke-width:3px,color:#fff,rx:5,ry:5
+    style PaperSelected fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Analysis fill:#6a1b9a,stroke:#4a148c,stroke-width:3px,color:#fff,rx:5,ry:5
+    style NewSearch fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Commands fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:5,ry:5
 ```
 
 This interactive mode:
@@ -478,6 +471,7 @@ RAG/
 ### 1. Retrieval-Augmented Generation (RAG)
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
 flowchart LR
     Paper([Paper Text]) --> Chunk[Chunking<br/>1000 chars<br/>200 overlap]
     
@@ -494,17 +488,17 @@ flowchart LR
     Compress --> LLM[Gemini<br/>Generation]
     LLM --> Answer([Answer with<br/>Citations])
     
-    style Paper fill:#424242,stroke:#212121,stroke-width:3px,color:#fff
-    style Query fill:#424242,stroke:#212121,stroke-width:3px,color:#fff
-    style Index fill:#1565c0,stroke:#0d47a1,stroke-width:3px,color:#fff
-    style Compress fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
-    style Answer fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
-    style Chunk fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Vec fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style QVec fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Sim fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
-    style TopK fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
-    style LLM fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
+    style Paper fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Query fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Index fill:#1565c0,stroke:#0d47a1,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Compress fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Answer fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Chunk fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Vec fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style QVec fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Sim fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style TopK fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style LLM fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
 ```
 
 The RAG pattern ensures answers are grounded in actual paper content rather than relying solely on the LLM's training data:
@@ -517,6 +511,7 @@ The RAG pattern ensures answers are grounded in actual paper content rather than
 ### 2. Context Compression (ScaleDown)
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
 flowchart TD
     Raw[Raw Retrieved Chunks<br/>1500 tokens<br/>Redundant verbose] --> SD{ScaleDown API}
     
@@ -538,19 +533,19 @@ flowchart TD
         B4[Better Focus]
     end
     
-    style Raw fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff
-    style Query fill:#424242,stroke:#212121,stroke-width:2px,color:#fff
-    style Compressed fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
-    style SD fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
-    style Analyze fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Remove fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Preserve fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Optimize fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Benefits fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
-    style B1 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
-    style B2 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
-    style B3 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
-    style B4 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff
+    style Raw fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Query fill:#424242,stroke:#212121,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Compressed fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:5,ry:5
+    style SD fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Analyze fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Remove fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Preserve fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Optimize fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Benefits fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style B1 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    style B2 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    style B3 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
+    style B4 fill:#1976d2,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:5,ry:5
 ```
 
 Raw retrieved chunks are often redundant. ScaleDown's compression:
@@ -571,6 +566,7 @@ Inspired by research on self-verification and chain-of-verification (CoVe):
 ### 4. Question Triage
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
 flowchart LR
     Q([Question]) --> Classify{Gemini Triage<br/>+ Keyword Extract}
     
@@ -587,18 +583,18 @@ flowchart LR
     Papers2 --> Workflow2[Full Workflow<br/>All Stages ON]
     Workflow2 --> Answer3([Answer])
     
-    style Q fill:#424242,stroke:#212121,stroke-width:3px,color:#fff
-    style Classify fill:#d32f2f,stroke:#b71c1c,stroke-width:3px,color:#fff
-    style Direct fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
-    style Minimal fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
-    style Full fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff
-    style Answer1 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff
-    style Answer2 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff
-    style Answer3 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff
-    style Papers1 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Papers2 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Workflow1 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
-    style Workflow2 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
+    style Q fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Classify fill:#d32f2f,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Direct fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Minimal fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Full fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Answer1 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:10,ry:10
+    style Answer2 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:10,ry:10
+    style Answer3 fill:#1565c0,stroke:#0d47a1,stroke-width:2px,color:#fff,rx:10,ry:10
+    style Papers1 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Papers2 fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Workflow1 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Workflow2 fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
 ```
 
 A single Gemini call classifies questions into three tiers:
@@ -611,6 +607,7 @@ This saves 60-90 seconds for simple questions by skipping paper discovery entire
 ### 5. Resilient LLM Strategy
 
 ```mermaid
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'sans-serif'}}}%%
 flowchart TD
     Start([API Call]) --> Gemini{Gemini API}
     
@@ -625,14 +622,14 @@ flowchart TD
     
     Gemini -->|Other Error| Fail([Raise Exception])
     
-    style Start fill:#424242,stroke:#212121,stroke-width:3px,color:#fff
-    style Gemini fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff
-    style Success fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff
-    style FallbackSuccess fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff
-    style Fail fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff
-    style Retry fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff
-    style Wait fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff
-    style Fallback fill:#ef6c00,stroke:#e65100,stroke-width:2px,color:#fff
+    style Start fill:#424242,stroke:#212121,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Gemini fill:#1976d2,stroke:#0d47a1,stroke-width:3px,color:#fff,rx:5,ry:5
+    style Success fill:#2e7d32,stroke:#1b5e20,stroke-width:3px,color:#fff,rx:10,ry:10
+    style FallbackSuccess fill:#f57c00,stroke:#e65100,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Fail fill:#c62828,stroke:#b71c1c,stroke-width:3px,color:#fff,rx:10,ry:10
+    style Retry fill:#6a1b9a,stroke:#4a148c,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Wait fill:#00838f,stroke:#006064,stroke-width:2px,color:#fff,rx:5,ry:5
+    style Fallback fill:#ef6c00,stroke:#e65100,stroke-width:2px,color:#fff,rx:5,ry:5
 ```
 
 **Implementation:**
