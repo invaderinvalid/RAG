@@ -1,8 +1,9 @@
 site_name: Scientific Literature Explorer
 site_description: A RAG system for exploring scientific papers with ScaleDown compression and Gemini intelligence
 site_author: RAG Team
+site_url: https://invaderinvalid.github.io/RAG/
 
-repo_url: https://github.com/yourusername/RAG
+repo_url: https://github.com/invaderinvalid/RAG
 edit_uri: edit/main/docs/
 
 theme:
